@@ -55,7 +55,7 @@ export async function deleteUser(req, res) {
   try {
     const deletedUser = await User.findByIdAndUpdate(
       req.params.id,
-      { isActive: false },
+      { active: false },
       { new: true }
     );
     if (deletedUser) {
