@@ -7,13 +7,10 @@ const app = express();
 
 // Conexión a MongoDB usando mongoose
 mongoose
-  .connect(
-    'mongodb://127.0.0.1/delivery',
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect('mongodb://127.0.0.1/delivery', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log('Connected.');
   })
@@ -29,6 +26,10 @@ app.use(express.json());
 // Rutas usuario
 import userRoutes from './src/user/user.routes';
 app.use('/user', userRoutes);
+
+// Rutas restaurante
+import restaurantRoutes from './src/restaurant/restaurant.routes';
+app.use('/restaurant', restaurantRoutes);
 
 // Endpoint para 404
 app.use((req, res) => {
