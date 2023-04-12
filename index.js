@@ -2,10 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 
-// Creacion del app
+// App creation
 const app = express();
 
-// Conexión a MongoDB usando mongoose
+// Connection to DB
 mongoose
   .connect('mongodb://127.0.0.1/delivery', {
     useNewUrlParser: true,
@@ -23,18 +23,22 @@ mongoose
 app.use(cors());
 app.use(express.json());
 
-// Rutas usuario
+// User routes
 import userRoutes from './src/user/user.routes';
 app.use('/user', userRoutes);
 
-// Rutas restaurante
+// Restaurant routes
 import restaurantRoutes from './src/restaurant/restaurant.routes';
 app.use('/restaurant', restaurantRoutes);
 
-// Endpoint para 404
+// Product routes
+import productRoutes from './src/product/product.routes';
+app.use('/product', productRoutes);
+
+// Endpoint for 404
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found.' });
 });
 
-// Inicia app en puerto 8080
+// Start app on port 8080
 app.listen(8080);
