@@ -2,14 +2,14 @@ import { createOrder, deleteOrder, getOrderById, getOrders, updateOrder } from '
 import { Router } from 'express';
 const router = Router();
 
+// Endpoint POST /order
+router.post('/', createOrder);
+
 // Endpoint GET /order/:id
 router.get('/:id', getOrderById);
 
 // Endpoint GET /order
 router.get('/', getOrders);
-
-// Endpoint POST /order
-router.post('/', createOrder);
 
 // Endpoint PATCH /order/:id
 router.patch('/:id', updateOrder);

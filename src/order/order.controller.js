@@ -24,6 +24,7 @@ export async function getOrderById(req, res) {
   }
 }
 
+// TODO - Fix this function
 export async function getOrders(req, res) {
   try {
     const { user, restaurant, fromDate, toDate, status } = req.query;
@@ -43,6 +44,16 @@ export async function getOrders(req, res) {
   }
 }
 
+//TODO - Verify this function
+export async function getOrdersByStatus(req, res) {
+  try {
+    const orders = await Order.find({ status: 'created' });
+    res.status(200).json(orders);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+
 export async function updateOrder(req, res) {
   try {
     const order = await Order.findById(req.params.id);
@@ -52,7 +63,7 @@ export async function updateOrder(req, res) {
       return;
     }
 
-    if (order.status === 'pending') {
+    if (order.status === 'created') {
       const updatedOrder = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
       res.status(200).json(updatedOrder);
     } else {

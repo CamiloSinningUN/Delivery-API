@@ -4,18 +4,19 @@ import {
   getProductById,
   getProducts,
   updateProduct,
+  acceptProduct,
 } from './product.controller';
 import { Router } from 'express';
 const router = Router();
+
+// Endpoint POST /product
+router.post('/', createProduct);
 
 // Endpoint GET /product/:id
 router.get('/:id', getProductById);
 
 // Endpoint GET /product
 router.get('/', getProducts);
-
-// Endpoint POST /product
-router.post('/', createProduct);
 
 // Endpoint PATCH /product/:id
 router.patch('/:id', updateProduct);

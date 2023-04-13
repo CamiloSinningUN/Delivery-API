@@ -1,11 +1,27 @@
 import User from './user.model';
+import addressModel from '../address/address.model';
 
 export async function createUser(req, res) {
   try {
-    const { name, email, password } = req.body;
-    const newUser = new User({ name, email, password });
-    const result = await newUser.save();
-    res.status(201).json(result);
+    const { name, email, password, phone, address } = req.body;
+
+    if (!address) {
+      return res.status(400).json({ message: 'An address is required.' });
+    }
+
+    const newUser = new User({ name, email, password, phone });
+    const savedUser = await newUser.save();
+
+    const newAddress = new addressModel({ ...address });
+    const savedAddress = await newAddress.save();
+
+    await User.findByIdAndUpdate(
+      savedUser._id,
+      { $push: { addresses: savedAddress._id } },
+      { new: true }
+    );
+
+    res.status(201).json(savedUser);
   } catch (err) {
     res.status(500).json(err);
   }

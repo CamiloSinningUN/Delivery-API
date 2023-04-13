@@ -1,11 +1,28 @@
+import addressModel from '../address/address.model';
 import Restaurant from './restaurant.model';
+import orderModel from '../order/order.model';
 
 export async function createRestaurant(req, res) {
   try {
-    const { name, category } = req.body;
+    const { name, category, address } = req.body;
+
+    if (!address) {
+      res.status(400).json({ message: 'Address is required' });
+    }
+
     const newRestaurant = new Restaurant({ name, category });
-    const result = await newRestaurant.save();
-    res.status(201).json(result);
+    const savedRestaurant = await newRestaurant.save();
+
+    const newAddress = new addressModel({ ...address });
+    const savedAddress = await newAddress.save();
+
+    await Restaurant.findByIdAndUpdate(
+      savedRestaurant._id,
+      { $set: { address: savedAddress._id } },
+      { new: true }
+    );
+
+    res.status(201).json(savedRestaurant);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -32,7 +49,8 @@ export async function getRestaurants(req, res) {
     if (category) query.category = category;
     if (name) query.name = { $regex: new RegExp(name, 'i') };
 
-    const restaurants = await Restaurant.find(query);
+    // TODO - Fix this, popularity is based on orders
+    const restaurants = await Restaurant.find(query).sort({ popularity: -1 });
     res.status(200).json(restaurants);
   } catch (err) {
     res.status(500).json(err);

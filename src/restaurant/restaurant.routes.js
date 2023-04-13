@@ -8,14 +8,14 @@ import {
 import { Router } from 'express';
 const router = Router();
 
+// Endpoint POST /restaurant
+router.post('/', createRestaurant);
+
 // Endpoint GET /restaurant/:id
 router.get('/:id', getRestaurantById);
 
 // Endpoint GET /restaurant
 router.get('/', getRestaurants);
-
-// Endpoint POST /restaurant
-router.post('/', createRestaurant);
 
 // Endpoint PATCH /restaurant/:id
 router.patch('/:id', updateRestaurant);

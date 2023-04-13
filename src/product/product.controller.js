@@ -2,8 +2,8 @@ import Product from './product.model';
 
 export async function createProduct(req, res) {
   try {
-    const { name, category, restaurant } = req.body;
-    const newProduct = new Product({ name, category, restaurant });
+    const { name, description, category, price, restaurant } = req.body;
+    const newProduct = new Product({ name, description, category, price, restaurant });
     const result = await newProduct.save();
     res.status(201).json(result);
   } catch (err) {
@@ -32,7 +32,17 @@ export async function getProducts(req, res) {
     if (category) query.category = category;
     if (restaurant) query.restaurant = restaurant;
 
-    const products = await Product.find(query);
+    const products = await Product.aggregate([
+      { $match: query },
+      { $sort: { category: 1 } },
+      {
+        $group: {
+          _id: '$category',
+          products: { $push: '$$ROOT' },
+        },
+      },
+    ]);
+
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json(err);

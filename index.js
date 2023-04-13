@@ -23,6 +23,10 @@ mongoose
 app.use(cors());
 app.use(express.json());
 
+// Auth routes
+import authRoutes from './src/auth/auth.routes';
+app.use('/auth', authRoutes);
+
 // User routes
 import userRoutes from './src/user/user.routes';
 app.use('/user', userRoutes);
