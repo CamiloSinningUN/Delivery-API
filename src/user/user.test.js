@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import userRouter from './user.routes';
 import User from './user.model';
 import Address from '../address/address.model';
+import nodemon from '../../nodemon.json';
 
 const app = express();
 app.use(express.json());
@@ -11,7 +12,7 @@ app.use('/user', userRouter);
 
 beforeAll(async () => {
   await mongoose.connect(
-    `mongodb+srv://camilosinningcs:OBulgO00FlabAVp3@cluster0.pzsifjd.mongodb.net/?retryWrites=true&w=majority`,
+    `mongodb+srv://${nodemon.env.MONGO_USER}:${nodemon.env.MONGO_PASS}@cluster0.pzsifjd.mongodb.net/?retryWrites=true&w=majority`,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,

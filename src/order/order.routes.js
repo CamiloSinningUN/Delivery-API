@@ -12,14 +12,14 @@ const router = Router();
 // Endpoint POST /order
 router.post('/', createOrder);
 
+// ENDPOINT GET /order/sent
+router.get('/sent', getOrdersSent);
+
 // Endpoint GET /order/:id
 router.get('/:id', getOrderById);
 
 // Endpoint GET /order
 router.get('/', getOrders);
-
-// ENDPOINT GET /order/sent
-router.get('/sent', getOrdersSent);
 
 // Endpoint PATCH /order/:id
 router.patch('/:id', updateOrder);

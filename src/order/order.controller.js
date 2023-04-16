@@ -1,4 +1,6 @@
 import Order from './order.model';
+import User from '../user/user.model';
+import Restaurant from '../restaurant/restaurant.model';
 import haversine from 'haversine';
 
 export async function createOrder(req, res) {
@@ -56,7 +58,9 @@ export async function getOrdersSent(req, res) {
     };
     const sortBy = req.query.sortBy || '';
 
-    const orders = await Order.find({ status: 'sent' }).populate('user').populate('restaurant');
+    const orders = await Order.find({ status: 'sent' })
+      .populate({ path: 'user', model: User })
+      .populate({ path: 'restaurant', model: Restaurant });
 
     if (userLocation.lat && userLocation.lng) {
       orders.forEach((order) => {
@@ -104,18 +108,19 @@ export async function getOrdersSent(req, res) {
 
 export async function updateOrder(req, res) {
   try {
-    const { user, restaurant, fromDate, toDate, status } = req.query;
-    const query = { active: true };
+    const order = await Order.findOne({ _id: req.params.id, active: true });
 
-    if (user) query.user = user;
-    if (restaurant) query.restaurant = restaurant;
-    if (status) query.status = status;
-    if (fromDate && toDate) {
-      query.createdAt = { $gte: new Date(fromDate), $lte: new Date(toDate) };
+    if (!order) {
+      res.status(404).json({ message: 'Order not found or inactive' });
+      return;
     }
 
-    const orders = await Order.find(query);
-    res.status(200).json(orders);
+    if (order.status === 'created') {
+      const updatedOrder = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      res.status(200).json(updatedOrder);
+    } else {
+      res.status(403).json({ message: 'Order cannot be modified once it has been sent' });
+    }
   } catch (err) {
     res.status(500).json(err);
   }
