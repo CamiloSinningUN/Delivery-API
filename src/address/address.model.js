@@ -9,6 +9,8 @@ const addressSchema = mongoose.Schema(
     city: { type: String, required: [true, 'Insert a city.'] },
     state: { type: String, required: [true, 'Insert a state.'] },
     zipCode: { type: String },
+    lat: { type: Number, required: [true, 'Insert a lat.'] },
+    lng: { type: Number, required: [true, 'Insert a lng.'] },
     active: { type: Boolean, default: true },
   },
   { timestamps: true }

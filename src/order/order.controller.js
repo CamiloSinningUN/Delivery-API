@@ -1,4 +1,5 @@
 import Order from './order.model';
+import haversine from 'haversine';
 
 export async function createOrder(req, res) {
   try {
@@ -24,7 +25,6 @@ export async function getOrderById(req, res) {
   }
 }
 
-// TODO - Fix this function
 export async function getOrders(req, res) {
   try {
     const { user, restaurant, fromDate, toDate, status } = req.query;
@@ -44,10 +44,58 @@ export async function getOrders(req, res) {
   }
 }
 
-//TODO - Verify this function
-export async function getOrdersByStatus(req, res) {
+function calculateDistance(point1, point2) {
+  return haversine(point1, point2);
+}
+
+export async function getOrdersSent(req, res) {
   try {
-    const orders = await Order.find({ status: 'created' });
+    const userLocation = {
+      lat: parseFloat(req.query.userLat) || null,
+      lng: parseFloat(req.query.userLng) || null,
+    };
+    const sortBy = req.query.sortBy || '';
+
+    const orders = await Order.find({ status: 'sent' }).populate('user').populate('restaurant');
+
+    if (userLocation.lat && userLocation.lng) {
+      orders.forEach((order) => {
+        const userToRestaurantDistance = calculateDistance(userLocation, {
+          lat: order.restaurant.address.lat,
+          lng: order.restaurant.address.lng,
+        });
+        const restaurantToClientDistance = calculateDistance(
+          {
+            lat: order.restaurant.address.lat,
+            lng: order.restaurant.address.lng,
+          },
+          {
+            lat: order.user.address.lat,
+            lng: order.user.address.lng,
+          }
+        );
+
+        order._doc.userToRestaurantDistance = userToRestaurantDistance;
+        order._doc.restaurantToClientDistance = restaurantToClientDistance;
+      });
+    }
+
+    switch (sortBy) {
+      case 'userToRestaurant':
+        orders.sort((a, b) => a._doc.userToRestaurantDistance - b._doc.userToRestaurantDistance);
+        break;
+      case 'restaurantToClient':
+        orders.sort(
+          (a, b) => a._doc.restaurantToClientDistance - b._doc.restaurantToClientDistance
+        );
+        break;
+      case 'age':
+        orders.sort((a, b) => a.createdAt - b.createdAt);
+        break;
+      default:
+        break;
+    }
+
     res.status(200).json(orders);
   } catch (err) {
     res.status(500).json(err);

@@ -1,4 +1,11 @@
-import { createOrder, deleteOrder, getOrderById, getOrders, updateOrder } from './order.controller';
+import {
+  createOrder,
+  deleteOrder,
+  getOrderById,
+  getOrders,
+  updateOrder,
+  getOrdersSent,
+} from './order.controller';
 import { Router } from 'express';
 const router = Router();
 
@@ -10,6 +17,9 @@ router.get('/:id', getOrderById);
 
 // Endpoint GET /order
 router.get('/', getOrders);
+
+// ENDPOINT GET /order/sent
+router.get('/sent', getOrdersSent);
 
 // Endpoint PATCH /order/:id
 router.patch('/:id', updateOrder);

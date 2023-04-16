@@ -7,10 +7,13 @@ const app = express();
 
 // Connection to DB
 mongoose
-  .connect('mongodb://127.0.0.1/delivery', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(
+    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.pzsifjd.mongodb.net/?retryWrites=true&w=majority/backend`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then(() => {
     console.log('Connected.');
   })

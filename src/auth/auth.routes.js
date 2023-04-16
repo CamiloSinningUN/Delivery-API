@@ -4,3 +4,5 @@ const router = Router();
 
 // Endpoint POST /login
 router.post('/login', login);
+
+export default router;
