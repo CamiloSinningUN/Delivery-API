@@ -20,7 +20,7 @@ beforeAll(async () => {
   );
 });
 
-afterEach(async () => {
+beforeEach(async () => {
   await User.deleteMany();
   await Address.deleteMany();
 });

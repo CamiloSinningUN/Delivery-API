@@ -1,16 +1,16 @@
 import addressModel from '../address/address.model';
 import Restaurant from './restaurant.model';
-import orderModel from '../order/order.model';
+import Order from '../order/order.model';
 
 export async function createRestaurant(req, res) {
   try {
-    const { name, category, address } = req.body;
+    const { name, category, description, address } = req.body;
 
     if (!address) {
       res.status(400).json({ message: 'Address is required' });
     }
 
-    const newRestaurant = new Restaurant({ name, category });
+    const newRestaurant = new Restaurant({ name, description, category });
     const savedRestaurant = await newRestaurant.save();
 
     const newAddress = new addressModel({ ...address });
