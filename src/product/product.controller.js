@@ -13,11 +13,11 @@ export async function createProduct(req, res) {
 
 export async function getProductById(req, res) {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findOne({ _id: req.params.id, active: true });
     if (product) {
       res.status(200).json(product);
     } else {
-      res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({ message: 'Product not found or inactive' });
     }
   } catch (err) {
     res.status(500).json(err);
@@ -27,7 +27,7 @@ export async function getProductById(req, res) {
 export async function getProducts(req, res) {
   try {
     const { category, restaurant } = req.query;
-    const query = {};
+    const query = { active: true };
 
     if (category) query.category = category;
     if (restaurant) query.restaurant = restaurant;
@@ -51,12 +51,14 @@ export async function getProducts(req, res) {
 
 export async function updateProduct(req, res) {
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (updatedProduct) {
-      res.status(200).json(updatedProduct);
-    } else {
-      res.status(404).json({ message: 'Product not found' });
+    const product = await Product.findOne({ _id: req.params.id, active: true });
+    if (!product) {
+      res.status(404).json({ message: 'Product not found or inactive' });
+      return;
     }
+
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json(updatedProduct);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -64,6 +66,12 @@ export async function updateProduct(req, res) {
 
 export async function deleteProduct(req, res) {
   try {
+    const product = await Product.findOne({ _id: req.params.id, active: true });
+    if (!product) {
+      res.status(404).json({ message: 'Product not found or inactive' });
+      return;
+    }
+
     const deletedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       { active: false },

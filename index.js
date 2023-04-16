@@ -8,10 +8,11 @@ const app = express();
 // Connection to DB
 mongoose
   .connect(
-    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.pzsifjd.mongodb.net/?retryWrites=true&w=majority/backend`,
+    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.pzsifjd.mongodb.net/?retryWrites=true&w=majority`,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      dbName: 'backend',
     }
   )
   .then(() => {

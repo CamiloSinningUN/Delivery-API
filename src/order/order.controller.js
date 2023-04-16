@@ -14,11 +14,11 @@ export async function createOrder(req, res) {
 
 export async function getOrderById(req, res) {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findOne({ _id: req.params.id, active: true });
     if (order) {
       res.status(200).json(order);
     } else {
-      res.status(404).json({ message: 'Order not found' });
+      res.status(404).json({ message: 'Order not found or inactive' });
     }
   } catch (err) {
     res.status(500).json(err);
@@ -28,7 +28,7 @@ export async function getOrderById(req, res) {
 export async function getOrders(req, res) {
   try {
     const { user, restaurant, fromDate, toDate, status } = req.query;
-    const query = {};
+    const query = { active: true };
 
     if (user) query.user = user;
     if (restaurant) query.restaurant = restaurant;
@@ -104,19 +104,18 @@ export async function getOrdersSent(req, res) {
 
 export async function updateOrder(req, res) {
   try {
-    const order = await Order.findById(req.params.id);
+    const { user, restaurant, fromDate, toDate, status } = req.query;
+    const query = { active: true };
 
-    if (!order) {
-      res.status(404).json({ message: 'Order not found' });
-      return;
+    if (user) query.user = user;
+    if (restaurant) query.restaurant = restaurant;
+    if (status) query.status = status;
+    if (fromDate && toDate) {
+      query.createdAt = { $gte: new Date(fromDate), $lte: new Date(toDate) };
     }
 
-    if (order.status === 'created') {
-      const updatedOrder = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      res.status(200).json(updatedOrder);
-    } else {
-      res.status(403).json({ message: 'Order cannot be modified once it has been sent' });
-    }
+    const orders = await Order.find(query);
+    res.status(200).json(orders);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -124,16 +123,18 @@ export async function updateOrder(req, res) {
 
 export async function deleteOrder(req, res) {
   try {
+    const order = await Order.findOne({ _id: req.params.id, active: true });
+    if (!order) {
+      res.status(404).json({ message: 'Order not found or inactive' });
+      return;
+    }
+
     const deletedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       { active: false },
       { new: true }
     );
-    if (deletedOrder) {
-      res.status(200).json({ message: 'Order disabled' });
-    } else {
-      res.status(404).json({ message: 'Order not found' });
-    }
+    res.status(200).json({ message: 'Order disabled' });
   } catch (err) {
     res.status(500).json(err);
   }
